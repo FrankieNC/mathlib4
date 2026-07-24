@@ -436,9 +436,10 @@ instance instModule : Module 𝕜 (Lp E p μ) :=
 theorem coeFn_smul (c : 𝕜) (f : Lp E p μ) : ⇑(c • f) =ᵐ[μ] c • ⇑f :=
   AEEqFun.coeFn_smul _ _
 
-theorem coeFn_finsetSum_smul {ι : Type*} (s : Finset ι) (c : ι → 𝕜) (f : ι → Lp E p μ) :
-    ⇑(∑ i ∈ s, c i • f i) =ᵐ[μ] ∑ i ∈ s, c i • ⇑(f i) :=
-  (coeFn_finsetSum s _).trans <| eventuallyEq_sum fun i _ ↦ coeFn_smul (c i) (f i)
+theorem coeFn_linearCombination {ι : Type*} (c : ι →₀ 𝕜) (f : ι → Lp E p μ) :
+    ⇑(Finsupp.linearCombination 𝕜 f c) =ᵐ[μ] ∑ i ∈ c.support, c i • ⇑(f i) := by
+  rw [Finsupp.linearCombination_apply, Finsupp.sum]
+  exact (coeFn_finsetSum _ _).trans <| eventuallyEq_sum fun i _ ↦ coeFn_smul (c i) (f i)
 
 instance instIsCentralScalar [Module 𝕜ᵐᵒᵖ E] [IsBoundedSMul 𝕜ᵐᵒᵖ E] [IsCentralScalar 𝕜 E] :
     IsCentralScalar 𝕜 (Lp E p μ) where
